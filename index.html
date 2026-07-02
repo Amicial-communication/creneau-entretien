@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alternance création de contenus et communication digitale — Amicial</title>
+<style>
+  :root{
+    --ink: #3e5a7f;
+    --ink-soft: #4c6c94;
+    --paper: #EFEAE2;
+    --paper-light: #FAF8F4;
+    --line: #dcd5c9;
+    --rust: #f29559;
+    --rust-dark: #d67a3e;
+    --taken: #d9d3c7;
+    --taken-text: #8a8271;
+    --radius: 3px;
+  }
+
+  * { box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--ink);
+    color: var(--paper-light);
+    font-family: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+    min-height:100vh;
+  }
+
+  .wrap{
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+  }
+
+  header{
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgba(250,248,244,0.25);
+    padding-bottom: 28px;
+  }
+
+  .logo{
+    height: 40px;
+    margin-bottom: 24px;
+    display: block;
+  }
+
+  .adresse{
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    color: var(--paper);
+    opacity: 0.85;
+    margin: 16px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .eyebrow{
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--paper);
+    opacity: 0.65;
+    margin: 0 0 10px;
+  }
+
+  h1{
+    font-size: 32px;
+    line-height: 1.25;
+    margin: 0 0 14px;
+    font-weight: 500;
+    color: var(--paper-light);
+  }
+
+  .lede{
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--paper);
+    opacity: 0.85;
+    max-width: 56ch;
+    margin: 0;
+  }
+
+  .jour{
+    margin-bottom: 36px;
+  }
+
+  .jour h2{
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--paper);
+    margin: 0 0 14px;
+    display:flex;
+    align-items:center;
+    gap: 10px;
+  }
+
+  .jour h2::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background: rgba(245,228,211,0.2);
+  }
+
+  .creneaux{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 12px;
+  }
+
+  .creneau{
+    background: var(--paper-light);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    text-align: left;
+    cursor: pointer;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    position: relative;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+
+  .creneau:hover:not(:disabled){
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  }
+
+  .creneau:focus-visible{
+    outline: 2px solid var(--rust);
+    outline-offset: 2px;
+  }
+
+  .creneau .h{
+    font-size: 17px;
+    font-weight: 600;
+    display:block;
+    margin-bottom: 4px;
+  }
+
+  .creneau .s{
+    font-size: 12px;
+    opacity: 0.7;
+    display:block;
+  }
+
+  .creneau.selected{
+    border-color: var(--rust);
+    box-shadow: 0 0 0 2px var(--rust) inset;
+  }
+
+  .creneau:disabled{
+    background: var(--taken);
+    color: var(--taken-text);
+    cursor: not-allowed;
+    border-color: var(--taken);
+  }
+
+  .creneau:disabled .s::before{
+    content: "Pris — ";
+  }
+
+  /* panneau de confirmation */
+  .panel{
+    margin-top: 40px;
+    background: var(--paper-light);
+    color: var(--ink);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: none;
+  }
+
+  .panel.open{ display:block; }
+
+  .panel h3{
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 0 0 4px;
+    opacity: 0.6;
+  }
+
+  .panel .recap{
+    font-size: 20px;
+    margin: 0 0 20px;
+  }
+
+  label{
+    display:block;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 13px;
+    margin: 14px 0 6px;
+  }
+
+  input{
+    width:100%;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fff;
+    color: var(--ink);
+  }
+
+  input:focus-visible{
+    outline: 2px solid var(--rust);
+    outline-offset: 1px;
+  }
+
+  button.confirm{
+    margin-top: 22px;
+    width:100%;
+    background: var(--ink);
+    color: var(--paper-light);
+    border: none;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    padding: 14px;
+    border-radius: var(--radius);
+    cursor:pointer;
+  }
+
+  button.confirm:hover{ background: var(--ink-soft); }
+  button.confirm:disabled{ opacity:0.5; cursor:not-allowed; }
+
+  .msg{
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    margin-top: 14px;
+    padding: 10px 12px;
+    border-radius: var(--radius);
+  }
+
+  .msg.error{ background: #f4d9cf; color: var(--rust-dark); }
+  .msg.success{ background: #dcead9; color: #1e5c34; }
+
+  .confirmed-view{
+    text-align:center;
+    padding: 20px 0;
+  }
+
+  .stamp{
+    display:inline-block;
+    border: 2px solid var(--rust);
+    color: var(--rust);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    transform: rotate(-3deg);
+    margin-bottom: 16px;
+  }
+
+  footer{
+    margin-top: 48px;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 12px;
+    color: var(--paper);
+    opacity: 0.5;
+  }
+
+  .loading{
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    font-size: 14px;
+    color: var(--paper);
+    opacity: 0.7;
+  }
+
+  @media (max-width: 480px){
+    h1{ font-size: 26px; }
+    .wrap{ padding: 32px 18px 72px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <!-- Remplace src par le chemin du logo une fois ajouté au dépôt, ex: "logo-amicial.svg" -->
+    <img class="logo" src="logo-amicial.png" alt="Amicial" onerror="this.style.display='none'">
+    <p class="eyebrow">Alternance création de contenus et communication digitale</p>
+    <h1>Choisissez votre créneau pour votre entretien au siège d'Amicial</h1>
+    <p class="lede">Sélectionnez le rendez-vous qui vous convient. Une fois pris, un créneau n'est plus disponible pour les autres candidats. Vous recevrez une confirmation par email.</p>
+    <p class="adresse">📍 4A rue Rigoberta Menchu, 84000 Avignon</p>
+  </header>
+
+  <div id="loading" class="loading">Chargement des créneaux…</div>
+  <div id="jours"></div>
+
+  <div id="panel" class="panel">
+    <div id="formView">
+      <h3>Créneau sélectionné</h3>
+      <p class="recap" id="recap"></p>
+
+      <label for="prenom">Prénom</label>
+      <input id="prenom" type="text" autocomplete="given-name" required>
+
+      <label for="nom">Nom</label>
+      <input id="nom" type="text" autocomplete="family-name" required>
+
+      <label for="email">Email</label>
+      <input id="email" type="email" autocomplete="email" required>
+
+      <label for="telephone">Téléphone (optionnel)</label>
+      <input id="telephone" type="tel" autocomplete="tel">
+
+      <button class="confirm" id="confirmBtn">Confirmer ce rendez-vous</button>
+      <div id="msg"></div>
+    </div>
+
+    <div id="confirmedView" class="confirmed-view" style="display:none;">
+      <span class="stamp">Confirmé</span>
+      <p class="recap" id="recapConfirmed"></p>
+      <p style="font-family:'Helvetica Neue',Arial,sans-serif; font-size:14px; opacity:0.75;">
+        Un email de confirmation vous a été envoyé.
+      </p>
+    </div>
+  </div>
+
+  <footer>Amicial — Association d'aide, de soins et d'accompagnement à domicile</footer>
+</div>
+
+<script>
+  // ⚠️ Remplace cette URL par celle de ton déploiement Apps Script (voir mode d'emploi)
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbywknmMGeecpTxjTapvoptdJs1AvsZvSNj8RdJaMiMbVxHLNEPpPzp3XXV_XryRQAMz/exec";
+
+  const joursEl = document.getElementById('jours');
+  const loadingEl = document.getElementById('loading');
+  const panelEl = document.getElementById('panel');
+  const formView = document.getElementById('formView');
+  const confirmedView = document.getElementById('confirmedView');
+  const recapEl = document.getElementById('recap');
+  const recapConfirmedEl = document.getElementById('recapConfirmed');
+  const msgEl = document.getElementById('msg');
+  const confirmBtn = document.getElementById('confirmBtn');
+
+  let creneaux = [];
+  let selectedId = null;
+  let hasConfirmed = false;
+
+  async function chargerCreneaux(){
+    try{
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      if(!data.ok) throw new Error('Réponse invalide');
+      creneaux = data.creneaux;
+      afficherCreneaux();
+      loadingEl.style.display = 'none';
+    }catch(err){
+      loadingEl.textContent = "Impossible de charger les créneaux. Réessayez dans un instant.";
+    }
+  }
+
+  function afficherCreneaux(){
+    const parJour = {};
+    creneaux.forEach(c => {
+      if(!parJour[c.libelleDate]) parJour[c.libelleDate] = [];
+      parJour[c.libelleDate].push(c);
+    });
+
+    joursEl.innerHTML = '';
+    Object.entries(parJour).forEach(([libelle, liste]) => {
+      const jourDiv = document.createElement('div');
+      jourDiv.className = 'jour';
+
+      const h2 = document.createElement('h2');
+      h2.textContent = libelle;
+      jourDiv.appendChild(h2);
+
+      const grid = document.createElement('div');
+      grid.className = 'creneaux';
+
+      liste.forEach(c => {
+        const btn = document.createElement('button');
+        btn.className = 'creneau';
+        btn.disabled = c.statut === 'reserve';
+        if(String(c.id) === String(selectedId)) btn.classList.add('selected');
+
+        const h = document.createElement('span');
+        h.className = 'h';
+        h.textContent = c.horaire;
+        btn.appendChild(h);
+
+        const s = document.createElement('span');
+        s.className = 's';
+        s.textContent = c.statut === 'reserve' ? '' : 'Disponible';
+        btn.appendChild(s);
+
+        btn.addEventListener('click', () => selectionner(c));
+        grid.appendChild(btn);
+      });
+
+      jourDiv.appendChild(grid);
+      joursEl.appendChild(jourDiv);
+    });
+  }
+
+  function selectionner(creneau){
+    if(hasConfirmed) return;
+    selectedId = creneau.id;
+    recapEl.textContent = `${creneau.libelleDate} — ${creneau.horaire}`;
+    afficherCreneaux();
+    panelEl.classList.add('open');
+    msgEl.innerHTML = '';
+    panelEl.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+
+  confirmBtn.addEventListener('click', async () => {
+    const prenom = document.getElementById('prenom').value.trim();
+    const nom = document.getElementById('nom').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telephone = document.getElementById('telephone').value.trim();
+
+    if(!prenom || !nom || !email){
+      msgEl.innerHTML = '<div class="msg error">Merci de renseigner votre prénom, nom et email.</div>';
+      return;
+    }
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = 'Envoi en cours…';
+
+    try{
+      const res = await fetch(SCRIPT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // évite le préflight CORS avec Apps Script
+        body: JSON.stringify({ id: selectedId, nom, prenom, email, telephone })
+      });
+      const data = await res.json();
+
+      if(data.ok){
+        hasConfirmed = true;
+        formView.style.display = 'none';
+        confirmedView.style.display = 'block';
+        recapConfirmedEl.textContent = recapEl.textContent;
+      } else {
+        msgEl.innerHTML = `<div class="msg error">${data.error || "Ce créneau n'est plus disponible."}</div>`;
+        selectedId = null;
+        await chargerCreneaux();
+        confirmBtn.disabled = false;
+        confirmBtn.textContent = 'Confirmer ce rendez-vous';
+      }
+    }catch(err){
+      msgEl.innerHTML = '<div class="msg error">Erreur de connexion. Réessayez.</div>';
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = 'Confirmer ce rendez-vous';
+    }
+  });
+
+  chargerCreneaux();
+  // Rafraîchit l'affichage toutes les 20s pour refléter les prises des autres candidats
+  setInterval(() => { if(!hasConfirmed) chargerCreneaux(); }, 20000);
+</script>
+
+</body>
+</html>
